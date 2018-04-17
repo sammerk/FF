@@ -13,8 +13,8 @@ Dabei können die Lehrkräfte wählen, welche statistischen Kennwerte/graphische
 
 ### Variablen
 * `PID` kodiert die Lehrkraft
-* `v_dauer_pp` beschreibt wie lange eine Lehrkraft die `Bewertete_Statistik` betrachtet hat
-* `Informativität` ist Ergebnis einer likertskalierten Selbstauskunft mit den Polen "1 = gar nicht informativ" und "6 = sehr informativ"
+* `v_dauer_pp` beschreibt wie lange eine Lehrkraft die `Bewertete_Statistik` betrachtet hat (in Sekunden)
+* `Informativitaet` ist Ergebnis einer likertskalierten Selbstauskunft mit den Polen "1 = gar nicht informativ" und "6 = sehr informativ"
 
 Die Daten können mit folgendem Code importiert werden, wenn das file vorher lokal gespeichert wurde.
 ```{r, eval=FALSE}

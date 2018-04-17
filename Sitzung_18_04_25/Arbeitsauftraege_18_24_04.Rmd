@@ -34,7 +34,7 @@ Ebenfalls [dort](https://github.com/sammerk/FF) finden Sie den Datensatz für Au
 ## Aufgabe 1: Lebenszufriedenheit {.tabset}
 
 ### Aufgabenstellung
-<font color="#a51e41">Wie stark unterscheiden sich Menschen aus den alten und neuen Bundesländern _(Variable `eastwest`)_ in ihrer Lebenszufriedenheit _(Variable `ls01`)_.</font>
+<font color="#a51e41">Wie stark unterscheiden sich Menschen aus den alten und neuen Bundesländern _(Variable `eastwest`)_ in ihrer Lebenszufriedenheit _(Variable `ls01`)_? Suchen Sie eine Lösung mithilfe einfacher Regressionsanalyse</font>
 
 ### Lösungshilfe 1
 Abhängige Variable: Lebenszufriedenheit
@@ -56,7 +56,8 @@ ggplot(ALLBUS2016, aes(x=ls01)) + geom_histogram()
 ```
 
 ### Lösungshilfe 4
-Ordinale Dominazstatistik ist also gefragt, z.B Vargha's A ...
+Also kein Cohen's!
+Möglich wären ordinale Dominanzstatistiken, das wäre aber keine Regression
 ```{r}
 library(effsize) # für Vargha's A
 
@@ -77,40 +78,28 @@ ALLBUS2016%>%
 ggplot(ALLBUS2016, aes(x=ls01, fill = as.factor(eastwest))) + geom_bar(position="dodge")
 ```
 
-
-
-## Aufgabe 2: Geschlechtspezifische Disparitäten in der Wahlabsicht {.tabset}
-
-### Aufgabenstellung
-<font color="#a51e41">Wie stark unterscheiden sich Frauen und Männer _(Variable `sex`)_ in Ihrer Wahlabsicht _(Variable `pv01`)_?</font>
-
-### Lösungshilfe 1
-Abhängige Variable: Wahlabsicht
-Unabhängige Variable: Geschlecht
-
-### Lösungshilfe 2
-Beide Variablen sind nominal skaliert
-
-### Lösungshilfe 3
-Cramèr's V kann die Frage also beantworten ..
+### Lösungshilfe 5
+Als Regressionsmodell
 ```{r}
-library(DescTools) # für Cramèr's V
+reg_mod <- lm(ls01 ~ as.factor(eastwest), data = ALLBUS2016)
 
-## Die Hilfe zeigt, dass man eine Tabelle als 
-## Argument an `CramerV()` übergeben muss:
-?CramerV()
+# für die deskriptiv Statistik:
+print(reg_mod)
 
-CramerV(table(ALLBUS2016$sex, ALLBUS2016$pv01))
+# für die Inferenzstatistik:
+summary(reg_mod)  # Was bedeuten die p-Werte der t-Tests und des F-Tests?
 
-# Für den deskriptiven Überblick
-table(ALLBUS2016$sex, ALLBUS2016$pv01)
+# für schöne Tabellen:
+stargazer::stargazer(reg_mod, type = "text")
+
 ```
 
 
-## Aufgabe 3: Glücklichere Besserverdiener\*innen? {.tabset}
+
+## Aufgabe 2: Glücklichere Besserverdiener\*innen? {.tabset}
 
 ### Aufgabenstellung
-<font color="#a51e41">Wie hängen Lebenszufriedenheit _(Variable `ls01`)_ und Nettoeinkommen _(Variable `di01a`)_ zusammen?</font>
+<font color="#a51e41">Wie hängen Lebenszufriedenheit _(Variable `ls01`)_ und Nettoeinkommen _(Variable `di01a`)_ zusammen? Untersuchen SIe anhand von Regressionmodellen und diagnostizeren Sie, inwiefern die Annahmen der Inferenzstatistik gültig sind.</font>
 
 ### Lösungshilfe 1
 Abhängige Variable: Lebenszufriedenheit
@@ -130,12 +119,49 @@ data_A4_narm <- ALLBUS2016%>%
   select(di01a, ls01)%>%
   na.omit(.)
 
-lm(scale(ls01) ~ scale(di01a), data = data_A4_narm) 
+summary(lm(scale(ls01) ~ scale(di01a), data = data_A4_narm))
 
 ## plot zur Validierung der Linearitätsannahme
 ggplot(ALLBUS2016, aes(di01a, ls01)) + geom_jitter() + stat_smooth(method = "lm", se = F) + geom_smooth(color = "red", se = F)
 
 ```
 
+### Lösungshilfe 4
+Plots zur Diagnostik der Inferenzstatistik erhält man wie folgt:
+```{r}
+## Zunächst brauchen wir einen Datensatz,
+## der nur die beiden Variablen und
+## keine Missings enthält ...
+data_A4_narm <- ALLBUS2016%>%
+  select(di01a, ls01)%>%
+  na.omit(.)
 
+# Plot der Diagnostik
+plot(lm(scale(ls01) ~ scale(di01a), data = data_A4_narm))
+
+# Die Verletzung der Heteroskedastizität wird auch schon im Scatterplot deutlich:
+ggplot(ALLBUS2016, aes(di01a, ls01)) + geom_jitter() + stat_smooth(method = "lm", se = F) + geom_smooth(color = "red", se = F)
+```
+
+
+## Aufgabe 3: Verweildauern bei Unterrichtsqualitätsrückmeldungen {.tabset}
+
+### Aufgabenstellung
+<font color="#a51e41">Modellieren Sie den Zusammenhang zwischen Informativität und Verweildauer mithilfe eines Regressionsmodells. Welche Annahmen sind verletzt?</font>
+
+### Lösungshilfe 1
+Abhängige Variable: Verweildauer
+Unabhängige Variable: Informativität
+
+
+### Lösungshilfe 2
+Die Schätzung:
+```{r}
+# Datenimport
+library(tidyverse)
+data_Informativitaet <- read_delim("https://raw.githubusercontent.com/sammerk/FF/master/Sitzung_18_04_25/data/data_Informativitaet.csv", 
+                                   delim = ";", escape_double = FALSE, trim_ws = TRUE)
+# Modellierung
+lm(v_dauer_t_pp ~ Informativitaet, data = data_Informativitaet)
+```
 
