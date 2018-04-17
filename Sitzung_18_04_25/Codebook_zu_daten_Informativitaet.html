@@ -123,8 +123,8 @@ $(document).ready(function () {
 </div>
 
 
-<div id="variablenbeschreibung" class="section level2">
-<h2>Variablenbeschreibung</h2>
+<div id="kontext" class="section level2">
+<h2>Kontext</h2>
 <p>Der Datensatz stammt aus einem Experiment, indem sich Lehkräfte (fragebogenbasiert erhobene) Rückmeldungen zu Unterrichtsqualität in einem Onlineportal abrufen können.<br />
 Dabei können die Lehrkräfte wählen, welche statistischen Kennwerte/graphischen Darstellungen sie sehen möchten.</p>
 <div id="variablen" class="section level3">
@@ -134,10 +134,14 @@ Dabei können die Lehrkräfte wählen, welche statistischen Kennwerte/graphische
 <li><code>v_dauer_pp</code> beschreibt wie lange eine Lehrkraft die <code>Bewertete_Statistik</code> betrachtet hat</li>
 <li><code>Informativität</code> ist Ergebnis einer likertskalierten Selbstauskunft mit den Polen “1 = gar nicht informativ” und “6 =sehr informativ”</li>
 </ul>
-<p>Die Daten können mit folgendem Code importiert werden:</p>
+<p>Die Daten können mit folgendem Code importiert werden, wenn das file vorher lokal gespeichert wurde.</p>
 <pre class="r"><code>library(readr)
 data_Informativitaet &lt;- read_delim(&quot;YOUR_PATH_TO/data_Informativitaet.csv&quot;, 
     &quot;;&quot;, escape_double = FALSE, trim_ws = TRUE)</code></pre>
+<p>Die Daten können auch direkt aus dem Netz gezogen werden, via</p>
+<pre class="r"><code>library(tidyverse)
+data_Informativitaet &lt;- read_delim(&quot;https://raw.githubusercontent.com/sammerk/FF/master/Sitzung_18_04_25/data/data_Informativitaet.csv&quot;, 
+                                   delim = &quot;;&quot;, escape_double = FALSE, trim_ws = TRUE)</code></pre>
 </div>
 </div>
 
