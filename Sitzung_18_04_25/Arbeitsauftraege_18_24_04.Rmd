@@ -1,0 +1,141 @@
+---
+title: "Arbeitaufträge des FF auf den 24.04.2018"
+output: 
+  html_document: 
+    theme: lumen
+    toc: true
+    toc_float: true
+    css: /Users/samuelmerk/Documents/Style/my_html_document.css
+---
+
+## Ziel der Aufgaben
+Sie
+
+* üben den Datenimport in R,
+* wiederholen die Basics der einfachen Regressionsanalyse,
+* wiederholen die Regressiondiagnostik zur Inferenzstatistik der einfachen Regressionsanalyse und
+* verschaffen sich einen ersten Eindruck von Random-Intercept-Modellen mit `lmer()`.
+
+
+
+
+## Herunterladen der Daten
+Für die folgenden Aufgaben brauchen Sie Daten. 
+Aufgaben XX beziehen sich auf die Daten des ALLBUS2016 (Vollversion): Diese können Sie [hier](https://www.gesis.org/allbus/download/download-querschnitte/) herunterladen. Dazu müssen Sie sich registrieren.
+
+Damit Sie die Syntax der gestuften Lösungshilfen verwenden können, nennen Sie bitte das file in _ALLBUS2016.sav_ um und speichern es in Ihrem Workingdirectory (also dort wo ihr RStudio-Projekt, das sie gerade verwenden auch gespeichert ist).
+
+Auf meinem [Github-Repo zur Veranstaltung](https://github.com/sammerk/FF) finden unter der heutigen Sitzung im Ordner `data` außerdem den Fragebogen und das Codebook zum ALLBUS2016. Anhand dieser können sie die Zuordnungen $Frage \Longleftrightarrow Variablenname$ sowie $Antwort \Longleftrightarrow Variablenausprägung$ vornehmen.
+
+Ebenfalls [dort](https://github.com/sammerk/FF) finden Sie den Datensatz für Aufgabe XX.
+
+## Aufgaben zur Übung
+
+## Aufgabe 1: Lebenszufriedenheit {.tabset}
+
+### Aufgabenstellung
+<font color="#a51e41">Wie stark unterscheiden sich Menschen aus den alten und neuen Bundesländern _(Variable `eastwest`)_ in ihrer Lebenszufriedenheit _(Variable `ls01`)_.</font>
+
+### Lösungshilfe 1
+Abhängige Variable: Lebenszufriedenheit
+Unabhängige Variable: alte/neue Bundesländer
+
+### Lösungshilfe 2
+`ls01` kann man als metrisch ansehen
+
+### Lösungshilfe 3
+`ls01` ist eher nicht normalverteilt.
+```{r}
+library(haven) # für spss-Datei-Import
+ALLBUS2016 <- read_spss("ALLBUS2016.sav")
+
+hist(ALLBUS2016$ls01) 
+
+library(tidyverse)  # für ggplot
+ggplot(ALLBUS2016, aes(x=ls01)) + geom_histogram()
+```
+
+### Lösungshilfe 4
+Ordinale Dominazstatistik ist also gefragt, z.B Vargha's A ...
+```{r}
+library(effsize) # für Vargha's A
+
+## Da Daten in long-form sind nehmen wir effsize::VD.A,
+## da diese Funktion eine Formeleingabe erlaubt.
+
+### `as.factor()` ist notwendig, da eastwest nach dem Import
+### die Klasse "Labbeled double" hat.
+
+VD.A(ls01 ~ as.factor(eastwest), data = ALLBUS2016)
+
+# Für die deskriptiven Daten
+ALLBUS2016%>%
+  group_by(eastwest)%>%
+  summarize(meanls01 = mean(ls01, na.rm = T))
+
+# Für einen Plot
+ggplot(ALLBUS2016, aes(x=ls01, fill = as.factor(eastwest))) + geom_bar(position="dodge")
+```
+
+
+
+## Aufgabe 2: Geschlechtspezifische Disparitäten in der Wahlabsicht {.tabset}
+
+### Aufgabenstellung
+<font color="#a51e41">Wie stark unterscheiden sich Frauen und Männer _(Variable `sex`)_ in Ihrer Wahlabsicht _(Variable `pv01`)_?</font>
+
+### Lösungshilfe 1
+Abhängige Variable: Wahlabsicht
+Unabhängige Variable: Geschlecht
+
+### Lösungshilfe 2
+Beide Variablen sind nominal skaliert
+
+### Lösungshilfe 3
+Cramèr's V kann die Frage also beantworten ..
+```{r}
+library(DescTools) # für Cramèr's V
+
+## Die Hilfe zeigt, dass man eine Tabelle als 
+## Argument an `CramerV()` übergeben muss:
+?CramerV()
+
+CramerV(table(ALLBUS2016$sex, ALLBUS2016$pv01))
+
+# Für den deskriptiven Überblick
+table(ALLBUS2016$sex, ALLBUS2016$pv01)
+```
+
+
+## Aufgabe 3: Glücklichere Besserverdiener\*innen? {.tabset}
+
+### Aufgabenstellung
+<font color="#a51e41">Wie hängen Lebenszufriedenheit _(Variable `ls01`)_ und Nettoeinkommen _(Variable `di01a`)_ zusammen?</font>
+
+### Lösungshilfe 1
+Abhängige Variable: Lebenszufriedenheit
+Unabhängige Variable: Nettoeinkommen
+
+### Lösungshilfe 2
+Beide Variablen sind intervallskaliert
+
+### Lösungshilfe 3
+Die Korrelation = "einfache lineare Regression mit standardisierten Variablen" kann die Frage beantworten.
+```{r}
+## Zunächst brauchen wir einen Datensatz,
+## der nur die beiden Variablen und
+## keine Missings enthält ...
+
+data_A4_narm <- ALLBUS2016%>%
+  select(di01a, ls01)%>%
+  na.omit(.)
+
+lm(scale(ls01) ~ scale(di01a), data = data_A4_narm) 
+
+## plot zur Validierung der Linearitätsannahme
+ggplot(ALLBUS2016, aes(di01a, ls01)) + geom_jitter() + stat_smooth(method = "lm", se = F) + geom_smooth(color = "red", se = F)
+
+```
+
+
+
