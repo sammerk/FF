@@ -6,38 +6,39 @@ output:
     toc: true
     toc_float: true
     css: /Users/samuelmerk/Documents/Style/my_html_document.css
+
+bibliography: /Users/samuelmerk/Documents/library.bib
 ---
 
 ## Ziel der Aufgaben
 Sie
 
 * üben den Datenimport in R,
-* wiederholen die Basics der einfachen Regressionsanalyse,
-* wiederholen die Regressiondiagnostik zur Inferenzstatistik der einfachen Regressionsanalyse und
-* verschaffen sich einen ersten Eindruck von Random-Intercept-Modellen mit `lmer()`.
+* wiederholen die Basics der einfachen Regressionsanalyse und
+* wiederholen die Regressiondiagnostik zur Inferenzstatistik der einfachen Regressionsanalyse.
 
 
 
 
 ## Herunterladen der Daten
 Für die folgenden Aufgaben brauchen Sie Daten. 
-Aufgaben XX beziehen sich auf die Daten des ALLBUS2016 (Vollversion): Diese können Sie [hier](https://www.gesis.org/allbus/download/download-querschnitte/) herunterladen. Dazu müssen Sie sich registrieren.
+Aufgaben 1 & 2 beziehen sich auf die Daten des ALLBUS2016 (Vollversion): Diese können Sie [hier](https://www.gesis.org/allbus/download/download-querschnitte/) herunterladen. Dazu müssen Sie sich registrieren.
 
 Damit Sie die Syntax der gestuften Lösungshilfen verwenden können, nennen Sie bitte das file in _ALLBUS2016.sav_ um und speichern es in Ihrem Workingdirectory (also dort wo ihr RStudio-Projekt, das sie gerade verwenden auch gespeichert ist).
 
 Auf meinem [Github-Repo zur Veranstaltung](https://github.com/sammerk/FF) finden unter der heutigen Sitzung im Ordner `data` außerdem den Fragebogen und das Codebook zum ALLBUS2016. Anhand dieser können sie die Zuordnungen $Frage \Longleftrightarrow Variablenname$ sowie $Antwort \Longleftrightarrow Variablenausprägung$ vornehmen.
 
-Ebenfalls [dort](https://github.com/sammerk/FF) finden Sie den Datensatz für Aufgabe XX.
+Ebenfalls [dort](https://github.com/sammerk/FF) finden Sie die Datensätz für Aufgabe 3 `data_Informativitaet.csv` und Aufgabe 4 `Kultur.RData` [letzerer ist aus @Luhmann2013].
 
 ## Aufgaben zur Übung
 
 ## Aufgabe 1: Lebenszufriedenheit {.tabset}
 
 ### Aufgabenstellung
-<font color="#a51e41">Wie stark unterscheiden sich Menschen aus den alten und neuen Bundesländern _(Variable `eastwest`)_ in ihrer Lebenszufriedenheit _(Variable `ls01`)_? Suchen Sie eine Lösung mithilfe einfacher Regressionsanalyse</font>
+<font color="#a51e41">Wie stark unterscheiden sich Menschen aus den alten und neuen Bundesländern _(Variable `eastwest`)_ in ihrer Lebenszufriedenheit _(Variable `ls01`)_? Suchen Sie eine Lösung mithilfe einfacher Regressionsanalyse.</font>
 
 ### Lösungshilfe 1
-Abhängige Variable: Lebenszufriedenheit
+Abhängige Variable: Lebenszufriedenheit   
 Unabhängige Variable: alte/neue Bundesländer
 
 ### Lösungshilfe 2
@@ -56,7 +57,7 @@ ggplot(ALLBUS2016, aes(x=ls01)) + geom_histogram()
 ```
 
 ### Lösungshilfe 4
-Also kein Cohen's!
+Also kein Cohen's d!
 Möglich wären ordinale Dominanzstatistiken, das wäre aber keine Regression
 ```{r}
 library(effsize) # für Vargha's A
@@ -99,10 +100,10 @@ stargazer::stargazer(reg_mod, type = "text")
 ## Aufgabe 2: Glücklichere Besserverdiener\*innen? {.tabset}
 
 ### Aufgabenstellung
-<font color="#a51e41">Wie hängen Lebenszufriedenheit _(Variable `ls01`)_ und Nettoeinkommen _(Variable `di01a`)_ zusammen? Untersuchen SIe anhand von Regressionmodellen und diagnostizeren Sie, inwiefern die Annahmen der Inferenzstatistik gültig sind.</font>
+<font color="#a51e41">Wie hängen Lebenszufriedenheit _(Variable `ls01`)_ und Nettoeinkommen _(Variable `di01a`)_ zusammen? Untersuchen Sie anhand von Regressionmodellen und diagnostizeren Sie, inwiefern die Annahmen der Inferenzstatistik gültig sind.</font>
 
 ### Lösungshilfe 1
-Abhängige Variable: Lebenszufriedenheit
+Abhängige Variable: Lebenszufriedenheit  
 Unabhängige Variable: Nettoeinkommen
 
 ### Lösungshilfe 2
@@ -147,10 +148,10 @@ ggplot(ALLBUS2016, aes(di01a, ls01)) + geom_jitter() + stat_smooth(method = "lm"
 ## Aufgabe 3: Verweildauern bei Unterrichtsqualitätsrückmeldungen {.tabset}
 
 ### Aufgabenstellung
-<font color="#a51e41">Modellieren Sie den Zusammenhang zwischen Informativität und Verweildauer mithilfe eines Regressionsmodells. Welche Annahmen sind verletzt?</font>
+<font color="#a51e41">Modellieren Sie anhand des Datensatzes `data_Informativitaet.csv` den Zusammenhang zwischen Informativität und Verweildauer mithilfe eines Regressionsmodells. Welche Annahmen sind verletzt?</font>
 
 ### Lösungshilfe 1
-Abhängige Variable: Verweildauer
+Abhängige Variable: Verweildauer  
 Unabhängige Variable: Informativität
 
 
@@ -162,6 +163,42 @@ library(tidyverse)
 data_Informativitaet <- read_delim("https://raw.githubusercontent.com/sammerk/FF/master/Sitzung_18_04_25/data/data_Informativitaet.csv", 
                                    delim = ";", escape_double = FALSE, trim_ws = TRUE)
 # Modellierung
-lm(v_dauer_t_pp ~ Informativitaet, data = data_Informativitaet)
+reg_A3 <- lm(v_dauer_t_pp ~ Informativitaet, data = data_Informativitaet)
 ```
+
+### Lösungshilfe 3
+Prüfung Heteroskedastizität:
+```{r}
+plot(reg_A3)
+```
+  
+  
+Das Ergebnis ist offensichtlich problematisch!
+
+### Lösungshilfe 4
+Prüfung Linearität:
+```{r}
+ggplot(data_Informativitaet, aes(Informativitaet, v_dauer_t_pp)) + geom_jitter() + stat_smooth()
+```
+
+Das Ergebnis sieht eher nach einem U-förmigen Zusammenhang aus.  
+
+Dieses wird im nächsten Code-Chunk modelliert  
+```{r}
+reg_A3_binom <- lm(v_dauer_t_pp ~ Informativitaet + I(Informativitaet^2), 
+                   data = data_Informativitaet) 
+summary(reg_A3_binom)
+
+# Testung der inkrementellen Varianzaufklärung
+anova(reg_A3, reg_A3_binom)
+
+# Plot des binomialen Modells
+ggplot(data_Informativitaet, aes(Informativitaet, v_dauer_t_pp)) + geom_jitter() + geom_smooth(method = "lm", formula = y ~ x + I(x^2))
+```
+
+### Lösungshilfe 5
+Neben den bisherigen Verletzungen der Annahmen, kommt noch hinzu, dass es schon theoretisch nicht plausibel ist, die Residuuen als i.i.d anzunehmen, da der Datensatz Messwiederholungen enthält.
+
+
+
 

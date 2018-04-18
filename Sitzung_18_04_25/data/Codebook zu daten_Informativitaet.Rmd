@@ -1,0 +1,32 @@
+---
+title: "Codebook zu: `daten_Informativitaet.csv`"
+output: 
+   html_document:
+         css: /Users/samuelmerk/Documents/Style/my_html_document.css
+   
+---
+
+
+## Kontext
+Der Datensatz stammt aus einem Experiment, indem sich Lehkräfte (fragebogenbasiert erhobene) Rückmeldungen zu Unterrichtsqualität in einem Onlineportal abrufen können.  
+Dabei können die Lehrkräfte wählen, welche statistischen Kennwerte/graphischen Darstellungen sie sehen möchten.
+
+### Variablen
+* `PID` kodiert die Lehrkraft
+* `v_dauer_pp` beschreibt wie lange eine Lehrkraft die `Bewertete_Statistik` betrachtet hat (in Sekunden)
+* `Informativitaet` ist Ergebnis einer likertskalierten Selbstauskunft mit den Polen "1 = gar nicht informativ" und "6 = sehr informativ"
+
+Die Daten können mit folgendem Code importiert werden, wenn das file vorher lokal gespeichert wurde.
+```{r, eval=FALSE}
+library(readr)
+data_Informativitaet <- read_delim("YOUR_PATH_TO/data_Informativitaet.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+Die Daten können auch direkt aus dem Netz gezogen werden, via
+```{r, eval = F}
+library(tidyverse)
+data_Informativitaet <- read_delim("https://raw.githubusercontent.com/sammerk/FF/master/Sitzung_18_04_25/data/data_Informativitaet.csv", 
+                                   delim = ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
